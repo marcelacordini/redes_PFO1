@@ -20,7 +20,7 @@ El proyecto implementa un sistema de comunicación **cliente-servidor** utilizan
 
 El objetivo de esta práctica es implementar un sistema básico de comunicación **cliente-servidor** utilizando sockets TCP/IP, permitiendo recibir mensajes de un cliente, almacenarlos en una base de datos SQLite y enviar una confirmación al cliente.
 
-El proyecto cumple con los siguientes requerimientos:
+Requerimientos:
 
 * Configuración de un servidor TCP en `localhost:5000`.
 * Modularización mediante funciones independientes.
@@ -53,7 +53,6 @@ Mensaje recibido: <timestamp>
 | **datetime**     | Generación de fecha y hora         |
 | **Git / GitHub** | Control de versiones y repositorio |
 
-No es necesario instalar dependencias externas, ya que todos los módulos utilizados forman parte de la biblioteca estándar de Python.
 
 ---
 
@@ -75,7 +74,7 @@ redes_PFO1/
 └── README.md
 ```
 
-> **Nota:** El archivo `chat_pfo1.db` se genera automáticamente al iniciar el servidor y no necesita incluirse previamente en el repositorio.
+> **Nota:** El archivo `chat_pfo1.db` se genera automáticamente al iniciar el servidor.
 
 ---
 
@@ -199,97 +198,6 @@ El servidor utiliza IPv4 mediante `AF_INET` y TCP mediante `SOCK_STREAM`.
 
 ---
 
-# 🚀 Ejecución
-
-## 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/marcelacordini/redes_PFO1.git
-cd redes_PFO1
-```
-
----
-
-## 2. Iniciar el servidor
-
-Abrir una terminal dentro del directorio del proyecto y ejecutar:
-
-```bash
-python server.py
-```
-
-Si la inicialización es correcta, se mostrará:
-
-```text
-[BD] Base de datos 'chat_pfo1.db' inicializada correctamente.
-[SERVIDOR] Servidor escuchando en localhost:5000
-
-[SERVIDOR] Esperando nueva conexión...
-```
-
-El servidor quedará esperando conexiones de clientes.
-
----
-
-## 3. Iniciar el cliente
-
-Abrir una **segunda terminal** dentro del mismo directorio y ejecutar:
-
-```bash
-python client.py
-```
-
-El cliente intentará conectarse a:
-
-```text
-localhost:5000
-```
-
----
-
-# 💬 Ejemplo de interacción
-
-### Cliente
-
-```text
-[CLIENTE] Conectando al servidor localhost:5000...
-[CLIENTE] Conexión establecida con éxito.
-
---- Chat Iniciado ---
-Escribí tus mensajes a continuación. Ingresá 'éxito' para salir.
-
-Ingrese mensaje: Hola servidor
-[RESPUESTA SERVIDOR] -> Mensaje recibido: 2026-09-20 12:15:00
-
-Ingrese mensaje: Segundo mensaje
-[RESPUESTA SERVIDOR] -> Mensaje recibido: 2026-09-20 12:15:10
-
-Ingrese mensaje: éxito
-
-[CLIENTE] Finalizando sesión de chat...
-[CLIENTE] Socket del cliente cerrado.
-```
-
-### Servidor
-
-```text
-[SERVIDOR] Esperando nueva conexión...
-[SERVIDOR] Conexión aceptada desde 127.0.0.1:xxxxx
-
-[RECIBIDO] Mensaje: 'Hola servidor' de 127.0.0.1
-[BD] Mensaje guardado correctamente desde IP 127.0.0.1.
-
-[RECIBIDO] Mensaje: 'Segundo mensaje' de 127.0.0.1
-[BD] Mensaje guardado correctamente desde IP 127.0.0.1.
-
-[RECIBIDO] Mensaje: 'éxito' de 127.0.0.1
-[SERVIDOR] El cliente 127.0.0.1 finalizó la sesión.
-```
-
-> El puerto mostrado como `xxxxx` es asignado automáticamente por el sistema operativo al cliente.
-
----
-
 # 🗄️ Persistencia de datos
 
 Los mensajes recibidos se almacenan automáticamente en:
@@ -408,7 +316,7 @@ Enviar uno o varios mensajes:
 ```text
 Ingrese mensaje: Hola
 Ingrese mensaje: ¿Cómo estás?
-Ingrese mensaje: Este es otro mensaje
+Ingrese mensaje: Todo bien!
 ```
 
 ### Paso 5
@@ -466,30 +374,6 @@ chat_pfo1.db
 ## 🗄️ Registros almacenados en SQLite
 
 ![Registros almacenados en SQLite](img/base-datos.png)
-
----
-
-# 📌 Cumplimiento de la consigna
-
-| Requerimiento                              | Implementación                                 |
-| ------------------------------------------ | ---------------------------------------------- |
-| Socket en `localhost:5000`                 | `init_socket()`                                |
-| Comunicación TCP/IP                        | `AF_INET` + `SOCK_STREAM`                      |
-| Inicialización del socket mediante función | `init_socket()`                                |
-| Aceptar conexiones                         | `atender_clientes()`                           |
-| Recibir mensajes                           | `conn.recv(1024)`                              |
-| Múltiples mensajes                         | Bucle `while True`                             |
-| Base de datos SQLite                       | `sqlite3`                                      |
-| Campos requeridos                          | `id`, `contenido`, `fecha_envio`, `ip_cliente` |
-| Guardado de mensajes                       | `guardar_mensaje()`                            |
-| Timestamp                                  | `datetime.now()`                               |
-| IP del cliente                             | `addr[0]`                                      |
-| Respuesta al cliente                       | `Mensaje recibido: <timestamp>`                |
-| Manejo de puerto/socket                    | `OSError`                                      |
-| Manejo de errores de DB                    | `sqlite3.Error`                                |
-| Finalización con `éxito`                   | Condición en cliente y servidor                |
-| Modularización                             | Funciones separadas                            |
-| Comentarios de configuración               | Incluidos en `server.py`                       |
 
 ---
 
