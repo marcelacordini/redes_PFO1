@@ -445,7 +445,19 @@ chat_pfo1.db
 
 ## 💬 Cliente funcionando
 
-![Cliente funcionando](img/cliente-funcionado.png)
+![Cliente funcionando](img/cliente-funcionando.png)
+
+---
+
+## 📨 Mensajes - Respuestas
+
+![Mensaje - Respuesta](img/mensaje-respuesta.png)
+
+---
+
+## 📤 Salida
+
+![Mensaje - Respuesta](img/salida.png)
 
 ---
 
