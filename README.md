@@ -65,6 +65,8 @@ redes_PFO1/
 ├── img/
 │   ├── base-datos.png
 │   ├── cliente-funcionado.png
+│   ├── mensaje-respuesta.png
+│   ├── salida.png
 │   └── servidor-funcionando.png
 │
 ├── .gitignore

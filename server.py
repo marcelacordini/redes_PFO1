@@ -44,8 +44,7 @@ def init_db(db_name="chat_pfo1.db"):
 def guardar_mensaje(contenido, fecha_envio, ip_cliente,
                     db_name="chat_pfo1.db"):
     """
-    Guarda un mensaje recibido junto con su fecha/hora
-    y la dirección IP del cliente.
+    Guarda un mensaje recibido junto con su fecha/hora y la dirección IP del cliente.
     """
     try:
         conn = sqlite3.connect(db_name)
@@ -84,8 +83,7 @@ def init_socket(host="localhost", port=5000):
             socket.SOCK_STREAM
         )
 
-        # Permite reutilizar rápidamente el puerto al reiniciar
-        # el servidor después de cerrar una conexión.
+        # Permite reutilizar rápidamente el puerto al reiniciar el servidor después de cerrar una conexión.
         server_socket.setsockopt(
             socket.SOL_SOCKET,
             socket.SO_REUSEADDR,
@@ -117,8 +115,7 @@ def init_socket(host="localhost", port=5000):
 
 def atender_clientes(server_socket):
     """
-    Acepta conexiones de clientes y procesa los mensajes
-    enviados durante la sesión.
+    Acepta conexiones de clientes y procesa los mensajes enviados durante la sesión.
     """
     while True:
         try:
