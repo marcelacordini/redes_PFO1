@@ -1,0 +1,6 @@
+# Base de datos generada automáticamente
+chat_pfo1.db
+
+# Archivos de Python
+__pycache__/
+*.pyc
