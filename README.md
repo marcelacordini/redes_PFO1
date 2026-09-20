@@ -1,4 +1,58 @@
-PFO 1 - Programación sobre RedesChat Básico Cliente-Servidor con Sockets y SQLiteEste repositorio contiene la resolución de la Práctica Formativa Obligatoria 1 (PFO1) para la materia Programación sobre Redes.El propósito de esta práctica consiste en desarrollar un sistema de red bajo el paradigma cliente-servidor empleando sockets TCP/IP en Python, estructurado de manera modular para garantizar la persistencia automática de los mensajes intercambiados en una base de datos SQLite.AlumnaNombre: Marcela CordiniCarrera: Tecnicatura en Desarrollo de Software - IFTS 29Objetivos del TrabajoImplementar una aplicación de red robusta que cumpla con los siguientes lineamientos técnicos:Configurar y levantar un socket servidor a la escucha en localhost:5000.Dividir la lógica mediante funciones independientes para la inicialización del socket, la aceptación de conexiones y el almacenamiento en base de datos.Conectar un cliente interactivo capaz de enviar múltiples mensajes de forma consecutiva durante la misma sesión.Almacenar cada mensaje recibido de forma estructurada en SQLite registrando el contenido, la fecha de envío (timestamp) y la dirección IP de origen del cliente.Responder de vuelta al cliente con el formato de confirmación estricto: Mensaje recibido: <timestamp>.Incorporar control de excepciones y manejo de errores (puertos ocupados, problemas de acceso a la base de datos o fallas de conexión).Habilitar una palabra clave de salida (éxito) para cerrar el canal de comunicación de manera limpia.Tecnologías y EntornoPython 3.xSockets TCP/IP (socket)Base de Datos Relacional (sqlite3)Control de Tiempo (datetime)Git y GitHubEstructura del RepositorioPlaintextpfo1-programacion-sobre-redes/
+💻 PFO 1 — Programación sobre Redes
+Chat Cliente-Servidor con Sockets TCP/IP y SQLite
+
+Repositorio correspondiente a la Práctica Formativa Obligatoria 1 (PFO1) de la materia Programación sobre Redes.
+
+El proyecto implementa un sistema de comunicación cliente-servidor utilizando sockets TCP/IP en Python, con una arquitectura modular y persistencia automática de los mensajes intercambiados mediante SQLite.
+
+👩‍💻 Alumna
+
+Nombre: Marcela Cordini
+
+Carrera: Tecnicatura en Desarrollo de Software
+
+Institución: IFTS 29
+
+🎯 Objetivos del trabajo
+
+El proyecto tiene como objetivo implementar una aplicación de red que cumpla con los siguientes requerimientos:
+
+Configurar un socket servidor en localhost:5000.
+
+Separar la lógica mediante funciones independientes.
+
+Aceptar conexiones de clientes mediante TCP/IP.
+
+Permitir el envío de múltiples mensajes durante una misma sesión.
+
+Persistir automáticamente cada mensaje recibido en SQLite.
+
+Registrar:
+
+contenido del mensaje;
+
+fecha y hora de envío;
+
+dirección IP del cliente.
+
+Responder al cliente con el formato:
+
+Mensaje recibido: <timestamp>
+
+
+Incorporar manejo de excepciones y errores.
+
+Permitir finalizar la sesión mediante la palabra clave éxito.
+
+🛠️ Tecnologías utilizadas
+Tecnología	Uso
+Python 3.x	Lenguaje principal
+socket	Comunicación TCP/IP
+sqlite3	Persistencia de datos
+datetime	Registro de timestamps
+Git / GitHub	Control de versiones y repositorio
+📁 Estructura del repositorio
+redes_PFO1/
 │
 ├── img/
 │   ├── base-datos.png
@@ -9,23 +63,149 @@ PFO 1 - Programación sobre RedesChat Básico Cliente-Servidor con Sockets y SQL
 ├── client.py
 ├── server.py
 └── README.md
-Nota: La base de datos local chat_pfo1.db se genera de forma automatizada al iniciar el servidor por primera vez.Funcionamiento del SistemaLa arquitectura está compuesta por dos scripts principales que operan de manera independiente en la red local:server.py: Encargado de inicializar la estructura de SQLite, abrir el puerto de escucha y procesar la persistencia de datos.client.py: Interfaz de terminal que permite interactuar enviando cadenas de texto y recibiendo las confirmaciones temporales del servidor.Los parámetros de enlace predeterminados son:PlaintextHOST: localhost
+
+
+Nota: La base de datos chat_pfo1.db se genera automáticamente al iniciar el servidor por primera vez.
+
+🏗️ Funcionamiento del sistema
+
+La aplicación está compuesta por dos scripts principales:
+
+🖥️ server.py
+
+Se encarga de:
+
+Inicializar la base de datos SQLite.
+
+Crear la tabla mensajes.
+
+Configurar el socket TCP.
+
+Escuchar conexiones en localhost:5000.
+
+Aceptar conexiones de clientes.
+
+Obtener la dirección IP del cliente.
+
+Guardar los mensajes recibidos.
+
+Enviar la confirmación correspondiente.
+
+💬 client.py
+
+Se encarga de:
+
+Establecer la conexión TCP con el servidor.
+
+Permitir al usuario ingresar mensajes.
+
+Enviar múltiples mensajes durante una misma sesión.
+
+Mostrar las respuestas recibidas.
+
+Finalizar la conexión cuando se ingresa éxito.
+
+⚙️ Configuración predeterminada
+HOST: localhost
 PUERTO: 5000
-1. Módulo Servidor (server.py)El servidor ejecuta funciones modularizadas para separar responsabilidades:Inicialización y creación de la tabla mensajes en SQLite.Configuración del socket con la directiva SO_REUSEADDR para evitar bloqueos de puertos reutilizados.Bucle de escucha permanente para aceptar nuevas conexiones de clientes y extraer su dirección IP real.Para ponerlo en marcha:Bashpython server.py
-Servidor en Ejecución2. Módulo Cliente (client.py)El cliente establece el canal TCP con el servidor y gestiona el flujo de envío mediante un bucle interactivo:Para ejecutarlo se requiere abrir una terminal secundaria:Bashpython client.py
-Ejemplo de interacción en consola:Plaintext[CLIENTE] Conectando al servidor localhost:5000...
+
+🚀 Ejecución
+1. Iniciar el servidor
+
+Abrir una terminal dentro del directorio del proyecto y ejecutar:
+
+python server.py
+
+
+El servidor quedará escuchando conexiones en:
+
+localhost:5000
+
+2. Iniciar el cliente
+
+Abrir una segunda terminal y ejecutar:
+
+python client.py
+
+💬 Ejemplo de interacción
+[CLIENTE] Conectando al servidor localhost:5000...
 [CLIENTE] Conexión establecida con éxito.
 
 --- Chat Iniciado ---
-Escribí tus mensajes a continuación. Ingresá 'éxito' para salir.
+Escribí tus mensajes a continuación.
+Ingresá 'éxito' para salir.
 
 Ingrese mensaje: hola servidor
 [RESPUESTA SERVIDOR] -> Mensaje recibido: 2026-09-20 12:15:00
 
+Ingrese mensaje: ¿Cómo estás?
+[RESPUESTA SERVIDOR] -> Mensaje recibido: 2026-09-20 12:15:10
+
 Ingrese mensaje: éxito
 [CLIENTE] Finalizando sesión de chat...
-Cliente en Ejecución3. Persistencia de Datos (SQLite)Los registros de comunicación se guardan automáticamente en la base de datos chat_pfo1.db dentro de la tabla mensajes, la cual cuenta con el siguiente esquema relacional:ColumnaTipo de DatoDescripciónidINTEGER PRIMARY KEY AUTOINCREMENTIdentificador único autoincremental.contenidoTEXT NOT NULLTexto del mensaje enviado por el cliente.fecha_envioTEXT NOT NULLMarca temporal (timestamp) del momento exacto del registro.ip_clienteTEXT NOT NULLDirección IP del cliente conectado.Registros AlmacenadosManejo de ExcepcionesEl código contempla bloques de control estructurados (try-except) para mitigar fallos comunes en redes locales:ConnectionRefusedError: Detecta si el cliente intenta conectarse antes de que el servidor esté activo, informando al usuario de manera clara.OSError: Controla conflictos si el puerto 5000 se encuentra ocupado por otro proceso al iniciar el servidor.Errores de Base de Datos: Captura excepciones de escritura o lectura en SQLite para evitar caídas imprevistas del núcleo de red.Guía Rápida de Prueba LocalClonar e ingresar al repositorio:Bashgit clone <url-de-tu-repositorio>
-cd pfo1-programacion-sobre-redes
-Terminal 1 - Iniciar el servidor:Bashpython server.py
-Terminal 2 - Iniciar el cliente:Bashpython client.py
-Escribe tus mensajes y comprueba la respuesta del servidor. Escribe éxito para finalizar.
+
+🗄️ Persistencia de datos
+
+Los mensajes recibidos se almacenan automáticamente en:
+
+chat_pfo1.db
+
+
+Dentro de la tabla:
+
+mensajes
+
+Esquema de la tabla
+Columna	Tipo	Descripción
+id	INTEGER PRIMARY KEY AUTOINCREMENT	Identificador único
+contenido	TEXT NOT NULL	Mensaje enviado por el cliente
+fecha_envio	TEXT NOT NULL	Fecha y hora del registro
+ip_cliente	TEXT NOT NULL	Dirección IP del cliente
+🖼️ Evidencias de funcionamiento
+Servidor funcionando
+
+Cliente funcionando
+
+Registros almacenados en SQLite
+
+🛡️ Manejo de excepciones
+
+El proyecto incorpora bloques try-except para controlar errores habituales durante la ejecución.
+
+ConnectionRefusedError
+
+Se utiliza para detectar cuando el cliente intenta conectarse y el servidor todavía no está disponible.
+
+OSError
+
+Permite controlar problemas relacionados con el socket, como un puerto ocupado al intentar iniciar el servidor.
+
+Errores de SQLite
+
+Se contemplan excepciones relacionadas con la creación, lectura o escritura de la base de datos para evitar interrupciones inesperadas.
+
+🧪 Guía rápida de prueba
+Clonar el repositorio
+git clone https://github.com/marcelacordini/redes_PFO1.git
+cd redes_PFO1
+
+Terminal 1 — Servidor
+python server.py
+
+Terminal 2 — Cliente
+python client.py
+
+
+Luego:
+
+Escribir uno o varios mensajes.
+
+Verificar que el servidor responda con el timestamp correspondiente.
+
+Ingresar éxito para finalizar la sesión.
+
+Comprobar que los mensajes hayan sido almacenados en chat_pfo1.db.
+
+📌 Resultado
+
+El proyecto implementa una comunicación cliente-servidor mediante TCP/IP, permitiendo el intercambio de múltiples mensajes durante una misma conexión y almacenando cada mensaje recibido junto con su timestamp y la IP del cliente en una base de datos SQLite.
