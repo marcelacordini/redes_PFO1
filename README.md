@@ -4,7 +4,7 @@
 
 Repositorio correspondiente a la **Práctica Formativa Obligatoria 1 (PFO1)** de la materia **Programación sobre Redes**.
 
-El proyecto implementa un sistema de comunicación **cliente-servidor** utilizando **sockets TCP/IP en Python**, con una arquitectura modular y persistencia automática de los mensajes intercambiados mediante **SQLite**.
+El proyecto implementa un sistema de comunicación **cliente-servidor** utilizando **sockets TCP/IP en Python**, con una arquitectura modular, manejo de errores y persistencia de los mensajes recibidos mediante **SQLite**.
 
 ---
 
@@ -16,28 +16,30 @@ El proyecto implementa un sistema de comunicación **cliente-servidor** utilizan
 
 ---
 
-## 🎯 Objetivos del trabajo
+## 🎯 Objetivo del trabajo
 
-El proyecto tiene como objetivo implementar una aplicación de red que cumpla con los siguientes requerimientos:
+El objetivo de esta práctica es implementar un sistema básico de comunicación **cliente-servidor** utilizando sockets TCP/IP, permitiendo recibir mensajes de un cliente, almacenarlos en una base de datos SQLite y enviar una confirmación al cliente.
 
-* Configurar un socket servidor en `localhost:5000`.
-* Separar la lógica mediante funciones independientes.
-* Aceptar conexiones de clientes mediante TCP/IP.
-* Permitir el envío de múltiples mensajes durante una misma sesión.
-* Persistir automáticamente cada mensaje recibido en SQLite.
-* Registrar:
+El proyecto cumple con los siguientes requerimientos:
+
+* Configuración de un servidor TCP en `localhost:5000`.
+* Modularización mediante funciones independientes.
+* Aceptación de conexiones de clientes.
+* Recepción de múltiples mensajes durante una misma sesión.
+* Persistencia de los mensajes recibidos en SQLite.
+* Registro de:
 
   * contenido del mensaje;
-  * fecha y hora de envío;
+  * fecha y hora de recepción;
   * dirección IP del cliente.
-* Responder al cliente con el formato:
+* Respuesta al cliente mediante el formato:
 
 ```text
 Mensaje recibido: <timestamp>
 ```
 
-* Incorporar manejo de excepciones y errores.
-* Permitir finalizar la sesión mediante la palabra clave `éxito`.
+* Manejo de errores relacionados con sockets y base de datos.
+* Finalización de la sesión mediante la palabra clave `éxito`.
 
 ---
 
@@ -45,11 +47,13 @@ Mensaje recibido: <timestamp>
 
 | Tecnología       | Uso                                |
 | ---------------- | ---------------------------------- |
-| **Python 3.x**   | Lenguaje principal                 |
-| **socket**       | Comunicación TCP/IP                |
+| **Python 3.x**   | Lenguaje de programación           |
+| **socket**       | Comunicación mediante TCP/IP       |
 | **sqlite3**      | Persistencia de datos              |
-| **datetime**     | Registro de timestamps             |
+| **datetime**     | Generación de fecha y hora         |
 | **Git / GitHub** | Control de versiones y repositorio |
+
+No es necesario instalar dependencias externas, ya que todos los módulos utilizados forman parte de la biblioteca estándar de Python.
 
 ---
 
@@ -69,57 +73,111 @@ redes_PFO1/
 └── README.md
 ```
 
-> **Nota:** La base de datos `chat_pfo1.db` se genera automáticamente al iniciar el servidor por primera vez.
+> **Nota:** El archivo `chat_pfo1.db` se genera automáticamente al iniciar el servidor y no necesita incluirse previamente en el repositorio.
 
 ---
 
-## 🏗️ Funcionamiento del sistema
+# 🏗️ Arquitectura del sistema
 
-La aplicación está compuesta por dos scripts principales.
+La aplicación está dividida en dos componentes principales:
 
-### 🖥️ `server.py`
+```text
+┌─────────────────┐
+│     CLIENTE     │
+│    client.py    │
+└────────┬────────┘
+         │
+         │ TCP/IP
+         │ localhost:5000
+         ▼
+┌─────────────────┐
+│    SERVIDOR     │
+│    server.py    │
+└────────┬────────┘
+         │
+         │ SQLite
+         ▼
+┌─────────────────┐
+│  chat_pfo1.db   │
+│    mensajes     │
+└─────────────────┘
+```
 
-El servidor se encarga de:
+---
 
-* Inicializar la base de datos SQLite.
-* Crear la tabla `mensajes`.
-* Configurar el socket TCP.
+## 🖥️ Servidor — `server.py`
+
+El servidor es responsable de:
+
+* Inicializar la base de datos.
+* Crear la tabla `mensajes` si no existe.
+* Crear y configurar el socket TCP.
 * Escuchar conexiones en `localhost:5000`.
 * Aceptar conexiones de clientes.
 * Obtener la dirección IP del cliente.
-* Guardar los mensajes recibidos.
-* Enviar la confirmación correspondiente al cliente.
+* Recibir los mensajes enviados.
+* Registrar los mensajes en SQLite.
+* Generar un timestamp.
+* Enviar una respuesta de confirmación.
+* Controlar errores relacionados con sockets y SQLite.
+* Finalizar la conexión cuando el cliente envía `éxito`.
 
-### 💬 `client.py`
+### Funciones principales
 
-El cliente se encarga de:
+#### `init_db()`
 
-* Establecer la conexión TCP con el servidor.
-* Permitir al usuario ingresar mensajes.
-* Enviar múltiples mensajes durante una misma sesión.
-* Mostrar las respuestas recibidas.
-* Finalizar la conexión cuando se ingresa `éxito`.
+Inicializa la base de datos SQLite y crea la tabla `mensajes` si todavía no existe.
 
-### ⚙️ Configuración predeterminada
+#### `guardar_mensaje()`
+
+Guarda cada mensaje recibido junto con:
+
+* contenido;
+* fecha y hora;
+* dirección IP del cliente.
+
+#### `init_socket()`
+
+Configura el socket TCP del servidor.
+
+Utiliza:
+
+```python
+socket.AF_INET
+```
+
+para trabajar con IPv4 y:
+
+```python
+socket.SOCK_STREAM
+```
+
+para utilizar el protocolo TCP.
+
+El servidor queda asociado a:
 
 ```text
-HOST: localhost
-PUERTO: 5000
+localhost:5000
 ```
+
+#### `atender_clientes()`
+
+Acepta conexiones, recibe mensajes, guarda la información en SQLite y envía la respuesta correspondiente al cliente.
 
 ---
 
-## 🚀 Ejecución
+## 💬 Cliente — `client.py`
 
-### 1. Iniciar el servidor
+El cliente es responsable de:
 
-Abrir una terminal dentro del directorio del proyecto y ejecutar:
+* Conectarse al servidor mediante TCP.
+* Permitir el ingreso de mensajes por teclado.
+* Enviar múltiples mensajes durante una misma conexión.
+* Recibir y mostrar la respuesta del servidor.
+* Finalizar la sesión cuando el usuario ingresa `éxito`.
+* Manejar errores de conexión.
 
-```bash
-python server.py
-```
-
-El servidor quedará escuchando conexiones en:
+La conexión se realiza por defecto a:
 
 ```text
 localhost:5000
@@ -127,17 +185,67 @@ localhost:5000
 
 ---
 
-### 2. Iniciar el cliente
+# ⚙️ Configuración predeterminada
 
-Abrir una **segunda terminal** y ejecutar:
+```text
+HOST: localhost
+PUERTO: 5000
+PROTOCOLO: TCP
+```
+
+El servidor utiliza IPv4 mediante `AF_INET` y TCP mediante `SOCK_STREAM`.
+
+---
+
+# 🚀 Ejecución
+
+## 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/marcelacordini/redes_PFO1.git
+cd redes_PFO1
+```
+
+---
+
+## 2. Iniciar el servidor
+
+Abrir una terminal dentro del directorio del proyecto y ejecutar:
+
+```bash
+python server.py
+```
+
+Si la inicialización es correcta, se mostrará:
+
+```text
+[BD] Base de datos 'chat_pfo1.db' inicializada correctamente.
+[SERVIDOR] Servidor escuchando en localhost:5000
+
+[SERVIDOR] Esperando nueva conexión...
+```
+
+El servidor quedará esperando conexiones de clientes.
+
+---
+
+## 3. Iniciar el cliente
+
+Abrir una **segunda terminal** dentro del mismo directorio y ejecutar:
 
 ```bash
 python client.py
 ```
 
+El cliente intentará conectarse a:
+
+```text
+localhost:5000
+```
+
 ---
 
-## 💬 Ejemplo de interacción
+# 💬 Ejemplo de interacción
 
 ### Cliente
 
@@ -146,117 +254,243 @@ python client.py
 [CLIENTE] Conexión establecida con éxito.
 
 --- Chat Iniciado ---
-Escribí tus mensajes a continuación.
-Ingresá 'éxito' para salir.
+Escribí tus mensajes a continuación. Ingresá 'éxito' para salir.
 
-Ingrese mensaje: hola servidor
+Ingrese mensaje: Hola servidor
 [RESPUESTA SERVIDOR] -> Mensaje recibido: 2026-09-20 12:15:00
 
-Ingrese mensaje: ¿Cómo estás?
+Ingrese mensaje: Segundo mensaje
 [RESPUESTA SERVIDOR] -> Mensaje recibido: 2026-09-20 12:15:10
 
 Ingrese mensaje: éxito
+
 [CLIENTE] Finalizando sesión de chat...
+[CLIENTE] Socket del cliente cerrado.
 ```
+
+### Servidor
+
+```text
+[SERVIDOR] Esperando nueva conexión...
+[SERVIDOR] Conexión aceptada desde 127.0.0.1:xxxxx
+
+[RECIBIDO] Mensaje: 'Hola servidor' de 127.0.0.1
+[BD] Mensaje guardado correctamente desde IP 127.0.0.1.
+
+[RECIBIDO] Mensaje: 'Segundo mensaje' de 127.0.0.1
+[BD] Mensaje guardado correctamente desde IP 127.0.0.1.
+
+[RECIBIDO] Mensaje: 'éxito' de 127.0.0.1
+[SERVIDOR] El cliente 127.0.0.1 finalizó la sesión.
+```
+
+> El puerto mostrado como `xxxxx` es asignado automáticamente por el sistema operativo al cliente.
 
 ---
 
-## 🗄️ Persistencia de datos
+# 🗄️ Persistencia de datos
 
-Los mensajes recibidos se almacenan automáticamente en la base de datos:
+Los mensajes recibidos se almacenan automáticamente en:
 
 ```text
 chat_pfo1.db
 ```
 
-Dentro de la tabla:
+La base de datos contiene una tabla llamada:
 
 ```text
 mensajes
 ```
 
-### 📋 Esquema de la tabla
+## 📋 Esquema de la tabla
 
-| Columna       | Tipo                                | Descripción                    |
-| ------------- | ----------------------------------- | ------------------------------ |
-| `id`          | `INTEGER PRIMARY KEY AUTOINCREMENT` | Identificador único            |
-| `contenido`   | `TEXT NOT NULL`                     | Mensaje enviado por el cliente |
-| `fecha_envio` | `TEXT NOT NULL`                     | Fecha y hora del registro      |
-| `ip_cliente`  | `TEXT NOT NULL`                     | Dirección IP del cliente       |
+| Columna       | Tipo                                | Descripción                               |
+| ------------- | ----------------------------------- | ----------------------------------------- |
+| `id`          | `INTEGER PRIMARY KEY AUTOINCREMENT` | Identificador único del mensaje           |
+| `contenido`   | `TEXT NOT NULL`                     | Mensaje enviado por el cliente            |
+| `fecha_envio` | `TEXT NOT NULL`                     | Fecha y hora en que se recibió el mensaje |
+| `ip_cliente`  | `TEXT NOT NULL`                     | Dirección IP del cliente                  |
 
----
+Los datos se almacenan mediante una consulta parametrizada:
 
-## 🖼️ Evidencias de funcionamiento
-
-### 🖥️ Servidor funcionando
-
-![Servidor funcionando](img/servidor-funcionando.png)
-
-### 💬 Cliente funcionando
-
-![Cliente funcionando](img/cliente-funcionado.png)
-
-### 🗄️ Registros almacenados en SQLite
-
-![Registros almacenados en SQLite](img/base-datos.png)
+```python
+cursor.execute("""
+    INSERT INTO mensajes (contenido, fecha_envio, ip_cliente)
+    VALUES (?, ?, ?)
+""", (contenido, fecha_envio, ip_cliente))
+```
 
 ---
 
-## 🛡️ Manejo de excepciones
+# 🛡️ Manejo de errores
 
-El proyecto incorpora bloques `try-except` para controlar errores habituales durante la ejecución.
+El proyecto incorpora manejo de excepciones para evitar interrupciones inesperadas durante la ejecución.
+
+## 🔌 Errores de conexión
+
+El cliente contempla:
 
 ### `ConnectionRefusedError`
 
-Se utiliza para detectar cuando el cliente intenta conectarse y el servidor todavía no está disponible.
+Se utiliza cuando el cliente intenta conectarse mientras el servidor no está ejecutándose.
+
+El programa informa al usuario que debe iniciar `server.py`.
 
 ### `OSError`
 
-Permite controlar problemas relacionados con el socket, como un puerto ocupado al intentar iniciar el servidor.
-
-### Errores de SQLite
-
-Se contemplan excepciones relacionadas con la creación, lectura o escritura de la base de datos para evitar interrupciones inesperadas.
+Permite controlar problemas generales relacionados con la comunicación mediante sockets.
 
 ---
 
-## 🧪 Guía rápida de prueba
+## 🔧 Errores del servidor
 
-### Clonar el repositorio
+El servidor utiliza `OSError` para detectar problemas relacionados con la creación, configuración o utilización del socket.
 
-```bash
-git clone https://github.com/marcelacordini/redes_PFO1.git
-cd redes_PFO1
+Por ejemplo, puede producirse un error si el puerto `5000` no está disponible.
+
+---
+
+## 🗄️ Errores de SQLite
+
+Las operaciones relacionadas con la base de datos utilizan:
+
+```python
+except sqlite3.Error
 ```
 
-### Terminal 1 — Servidor
+Esto permite controlar errores relacionados con:
+
+* creación de la base de datos;
+* creación de tablas;
+* inserción de mensajes;
+* acceso a SQLite.
+
+Si la base de datos no puede inicializarse correctamente, el servidor no comienza a aceptar conexiones.
+
+---
+
+## 🔤 Errores de codificación
+
+El servidor también contempla `UnicodeDecodeError` para controlar mensajes que no puedan ser interpretados correctamente como UTF-8.
+
+---
+
+# 🧪 Guía rápida de prueba
+
+Para realizar una prueba local:
+
+### Paso 1
+
+Iniciar el servidor:
 
 ```bash
 python server.py
 ```
 
-### Terminal 2 — Cliente
+### Paso 2
+
+Abrir otra terminal.
+
+### Paso 3
+
+Iniciar el cliente:
 
 ```bash
 python client.py
 ```
 
-Luego:
+### Paso 4
 
-1. Escribir uno o varios mensajes.
-2. Verificar que el servidor responda con el timestamp correspondiente.
-3. Ingresar `éxito` para finalizar la sesión.
-4. Comprobar que los mensajes hayan sido almacenados en `chat_pfo1.db`.
+Enviar uno o varios mensajes:
+
+```text
+Ingrese mensaje: Hola
+Ingrese mensaje: ¿Cómo estás?
+Ingrese mensaje: Este es otro mensaje
+```
+
+### Paso 5
+
+Verificar que el cliente reciba una respuesta para cada mensaje:
+
+```text
+[RESPUESTA SERVIDOR] -> Mensaje recibido: <timestamp>
+```
+
+### Paso 6
+
+Finalizar la sesión:
+
+```text
+Ingrese mensaje: éxito
+```
+
+### Paso 7
+
+Comprobar que los mensajes hayan sido almacenados en:
+
+```text
+chat_pfo1.db
+```
 
 ---
 
-## 📌 Resultado
+# 🖼️ Evidencias de funcionamiento
 
-El proyecto implementa una comunicación **cliente-servidor mediante TCP/IP**, permitiendo el intercambio de múltiples mensajes durante una misma conexión y almacenando cada mensaje recibido junto con su timestamp y la IP del cliente en una base de datos SQLite.
+## 🖥️ Servidor funcionando
+
+![Servidor funcionando](img/servidor-funcionando.png)
 
 ---
 
-### 📚 PFO 1 — Programación sobre Redes
+## 💬 Cliente funcionando
+
+![Cliente funcionando](img/cliente-funcionado.png)
+
+---
+
+## 🗄️ Registros almacenados en SQLite
+
+![Registros almacenados en SQLite](img/base-datos.png)
+
+---
+
+# 📌 Cumplimiento de la consigna
+
+| Requerimiento                              | Implementación                                 |
+| ------------------------------------------ | ---------------------------------------------- |
+| Socket en `localhost:5000`                 | `init_socket()`                                |
+| Comunicación TCP/IP                        | `AF_INET` + `SOCK_STREAM`                      |
+| Inicialización del socket mediante función | `init_socket()`                                |
+| Aceptar conexiones                         | `atender_clientes()`                           |
+| Recibir mensajes                           | `conn.recv(1024)`                              |
+| Múltiples mensajes                         | Bucle `while True`                             |
+| Base de datos SQLite                       | `sqlite3`                                      |
+| Campos requeridos                          | `id`, `contenido`, `fecha_envio`, `ip_cliente` |
+| Guardado de mensajes                       | `guardar_mensaje()`                            |
+| Timestamp                                  | `datetime.now()`                               |
+| IP del cliente                             | `addr[0]`                                      |
+| Respuesta al cliente                       | `Mensaje recibido: <timestamp>`                |
+| Manejo de puerto/socket                    | `OSError`                                      |
+| Manejo de errores de DB                    | `sqlite3.Error`                                |
+| Finalización con `éxito`                   | Condición en cliente y servidor                |
+| Modularización                             | Funciones separadas                            |
+| Comentarios de configuración               | Incluidos en `server.py`                       |
+
+---
+
+# 📌 Resultado
+
+El proyecto implementa un **chat básico cliente-servidor mediante sockets TCP/IP**, permitiendo establecer una conexión entre cliente y servidor, intercambiar múltiples mensajes durante una misma sesión y almacenar cada mensaje recibido en una base de datos SQLite.
+
+Cada registro incluye el **contenido del mensaje, fecha y hora de recepción e IP del cliente**, mientras que el servidor devuelve una confirmación con el timestamp correspondiente.
+
+El sistema también incorpora **modularización, comentarios explicativos y manejo de errores**, de acuerdo con los requerimientos establecidos para la PFO1.
+
+---
+
+## 📚 PFO 1 — Programación sobre Redes
 
 **Tecnicatura en Desarrollo de Software — IFTS 29**
+
 **Marcela Cordini**
